@@ -22,8 +22,10 @@
 - `x` - Cut file/directory
 - `p` - Paste file/directory
 - `R` - Refresh tree
-- `H` - Toggle hidden files
+- `H` - Toggle hidden files (shown by default)
 - `?` - Show help (all keymaps)
+
+**Note**: Hidden files (like `.vscode`, `.git`) are visible by default.
 
 ---
 

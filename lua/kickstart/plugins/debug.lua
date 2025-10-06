@@ -141,6 +141,15 @@ return {
     --   vim.fn.sign_define(tp, { text = icon, texthl = hl, numhl = hl })
     -- end
 
+    -- Enhanced breakpoint visibility
+    vim.api.nvim_set_hl(0, 'DapBreak', { fg = '#ff0000', bold = true })  -- Bright red
+    vim.api.nvim_set_hl(0, 'DapStop', { fg = '#ffff00', bold = true })   -- Bright yellow
+    vim.fn.sign_define('DapBreakpoint', { text = '●', texthl = 'DapBreak', numhl = 'DapBreak' })
+    vim.fn.sign_define('DapBreakpointCondition', { text = '◉', texthl = 'DapBreak', numhl = 'DapBreak' })
+    vim.fn.sign_define('DapBreakpointRejected', { text = '✖', texthl = 'DapBreak', numhl = 'DapBreak' })
+    vim.fn.sign_define('DapStopped', { text = '▶', texthl = 'DapStop', numhl = 'DapStop' })
+    vim.fn.sign_define('DapLogPoint', { text = '◆', texthl = 'DapBreak', numhl = 'DapBreak' })
+
     dap.listeners.after.event_initialized['dapui_config'] = dapui.open
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close

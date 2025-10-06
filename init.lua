@@ -673,7 +673,10 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {}, -- Python LSP
+        sourcekit = { -- Swift LSP (uses Xcode's sourcekit-lsp, not Mason)
+          cmd = { 'sourcekit-lsp' }, -- Uses system PATH (from Xcode)
+        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -714,6 +717,13 @@ require('lazy').setup({
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
+
+      -- Filter out servers that aren't available via Mason (e.g., sourcekit from Xcode)
+      local mason_exclude = { 'sourcekit' }
+      ensure_installed = vim.tbl_filter(function(server)
+        return not vim.tbl_contains(mason_exclude, server)
+      end, ensure_installed)
+
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
       })
@@ -973,7 +983,7 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',

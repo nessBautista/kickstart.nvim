@@ -176,9 +176,26 @@ return {
       },
     }
 
+    -- Apple's LLDB with full Swift support
+    dap.adapters.lldb = {
+      type = 'executable',
+      command = '/Applications/Xcode.app/Contents/Developer/usr/bin/lldb-dap',
+      name = 'lldb',
+    }
+
     dap.configurations.swift = {
       {
-        name = 'Launch',
+        name = 'Launch Swift (lldb)',
+        type = 'lldb',
+        request = 'launch',
+        program = function()
+          return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
+      },
+      {
+        name = 'Launch Swift (codelldb)',
         type = 'codelldb',
         request = 'launch',
         program = function()

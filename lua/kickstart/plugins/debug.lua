@@ -166,6 +166,27 @@ return {
     -- Python specific config
     require('dap-python').setup('python3')
 
+    -- Add custom Python configurations for individual scripts
+    table.insert(dap.configurations.python, {
+      type = 'python',
+      request = 'launch',
+      name = 'Launch current file',
+      program = '${file}',
+      console = 'integratedTerminal',
+    })
+
+    table.insert(dap.configurations.python, {
+      type = 'python',
+      request = 'launch',
+      name = 'Launch file with args',
+      program = '${file}',
+      args = function()
+        local args_string = vim.fn.input('Arguments: ')
+        return vim.split(args_string, " +")
+      end,
+      console = 'integratedTerminal',
+    })
+
     -- Swift/LLDB specific config
     dap.adapters.codelldb = {
       type = 'server',

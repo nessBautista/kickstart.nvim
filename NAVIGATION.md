@@ -202,14 +202,103 @@
 
 ---
 
-## 9. Format & Actions
+## 9. Working with Terminal
+
+### Current Setup (Built-in Terminal)
+
+**Opening Terminals:**
+- `:terminal` or `:term` - Open terminal in current window
+- `:split | terminal` - Open terminal in horizontal split
+- `:vsplit | terminal` - Open terminal in vertical split
+
+**Using Terminal:**
+- Type commands normally in Insert mode
+- `<Esc><Esc>` - Exit terminal mode (return to Normal mode)
+- `i` or `a` - Re-enter terminal Insert mode
+- `<C-\><C-n>` - Alternative way to exit terminal mode
+
+**Navigation:**
+- Use `<C-h/j/k/l>` to move between terminal and other windows
+- In Normal mode (after `<Esc><Esc>`), you can yank/search terminal output
+
+**Common Workflows:**
+- Run long-running processes while editing (tests, builds, servers)
+- Quick shell commands without leaving Neovim
+- View command output alongside your code
+
+### ToggleTerm Plugin (Installed)
+
+You have `toggleterm.nvim` installed for an enhanced terminal experience:
+
+**Features:**
+- Toggle floating terminal with a single keymap
+- Multiple persistent terminal sessions
+- Send commands from buffers to terminal
+- Horizontal/vertical/floating/tab layouts
+
+**Keybindings:**
+- `<Space>tt` - **Toggle floating terminal** (main command)
+- `<Space>th` - **Toggle horizontal terminal** (split below)
+- `<Space>tv` - **Toggle vertical terminal** (split right)
+- `<Space>t1` - **Switch to terminal #1**
+- `<Space>t2` - **Switch to terminal #2**
+- `<Space>t3` - **Switch to terminal #3**
+- `<Space>t4` - **Switch to terminal #4**
+- `<Esc><Esc>` - **Exit terminal mode** (return to Normal mode)
+
+**Example Workflow:**
+1. Press `<Space>tt` to open floating terminal
+2. Run your command (e.g., `npm test`)
+3. Press `<Space>tt` again to hide (keeps running)
+4. Press `<Space>t2` to open a second terminal for a different task
+5. Press `<Space>t1` to switch back to the first terminal
+6. Use `<Space>th` or `<Space>tv` for split layouts when you want to see code and terminal simultaneously
+
+---
+
+## 10. Markdown Preview
+
+### Live Preview in Browser
+
+You have `markdown-preview.nvim` installed for real-time markdown preview:
+
+**Features:**
+- Live preview in your default browser
+- Synchronized scrolling between editor and preview
+- Supports GitHub Flavored Markdown (GFM)
+- Dark and light theme support
+- Auto-refresh on save
+
+**Keybindings:**
+- `<Space>mp` - **Toggle Markdown Preview** - Open/close preview in browser
+
+**Commands:**
+- `:MarkdownPreview` - Open preview
+- `:MarkdownPreviewStop` - Close preview
+- `:MarkdownPreviewToggle` - Toggle preview
+
+**Example Workflow:**
+1. Open any `.md` file in Neovim
+2. Press `<Space>mp` to start the preview
+3. Your default browser will open with live preview
+4. Edit your markdown - changes appear instantly in browser
+5. Press `<Space>mp` again to stop the preview
+
+**Configuration:**
+- Theme: Dark mode (can be changed to 'light' in config)
+- Auto-close: Preview closes when you switch to non-markdown buffers
+- Port: Automatically assigned (usually localhost:8080)
+
+---
+
+## 11. Format & Actions
 
 - `<Space>f` - **Format Buffer** - Auto-format current file
 - `<Space>th` - **Toggle Inlay Hints** - Show/hide type hints
 
 ---
 
-## 10. Frequently Asked Questions (FAQ)
+## 12. Frequently Asked Questions (FAQ)
 
 ### What is a buffer?
 

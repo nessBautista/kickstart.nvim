@@ -104,6 +104,12 @@ vim.o.number = true
 --  Experiment for yourself to see if you like it!
 -- vim.o.relativenumber = true
 
+-- Set tab spacing to 3 spaces
+vim.o.tabstop = 3        -- Number of spaces that a <Tab> in the file counts for
+vim.o.softtabstop = 3    -- Number of spaces that a <Tab> counts for while editing
+vim.o.shiftwidth = 3     -- Number of spaces to use for each step of (auto)indent
+vim.o.expandtab = true   -- Use spaces instead of tabs
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
 
@@ -247,7 +253,7 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  -- 'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -1024,4 +1030,4 @@ require('lazy').setup({
 })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
+-- vim: ts=3 sts=3 sw=3 et

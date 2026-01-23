@@ -1,0 +1,18 @@
+{
+  "agents" : {
+    "claude" : true,
+    "gemini" : true,
+    "ssh_port" : 2220
+  },
+  "environment" : {
+    "isolate_paths" : [
+      ".venv",
+      "__pycache__"
+    ],
+    "package_manager" : "uv",
+    "stack" : "python",
+    "version" : "3.12"
+  },
+  "mode" : "devbox",
+  "project_name" : "nvim"
+}

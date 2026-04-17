@@ -291,14 +291,57 @@ You have `markdown-preview.nvim` installed for real-time markdown preview:
 
 ---
 
-## 11. Format & Actions
+## 11. Git (Neogit)
+
+### Live Git Interface
+
+You have `neogit` installed for a Magit-like Git experience inside Neovim.
+
+**Keybindings:**
+- `<Space>gs` - **Git Status** - Open Neogit status buffer (main entry point)
+- `<Space>gS` - **Git Status (vsplit)** - Open Neogit in a vertical split
+- `<Space>gl` - **Git Log** - Open the Neogit log view
+- `<Space>gc` - **Git Commit** - Open the commit popup directly
+- `<Space>gp` - **Git Push** - Open the push popup
+- `<Space>gP` - **Git Pull** - Open the pull popup
+
+**In-buffer Neogit keys (inside the status buffer):**
+- `<Tab>` - Expand/collapse section or hunk
+- `s` - Stage file/hunk under cursor
+- `u` - Unstage file/hunk under cursor
+- `x` - Discard changes under cursor
+- `c` - Open commit popup (then `c` again to commit)
+- `P` - Open push popup
+- `p` - Open pull popup
+- `l` - Open log popup
+- `b` - Open branch popup
+- `Z` - Open stash popup
+- `$` - View git command history/output
+- `<CR>` - Open file under cursor
+- `q` - Close Neogit buffer
+- `?` - Show help for current popup
+
+**Example Workflow (stage, commit, push):**
+1. `<Space>gs` - Open Neogit status
+2. Move cursor onto a changed file; press `s` to stage (or `Tab` to expand and stage individual hunks)
+3. Press `c` then `c` to open the commit message editor
+4. Write the message and `:wq` to commit
+5. Press `P` then `p` to push to the upstream branch
+
+**Notes:**
+- Diffs use `diffview.nvim` when available — press `d` on a file for a side-by-side diff.
+- Neogit defaults to opening in a new tab (configurable via `kind` in the plugin spec).
+
+---
+
+## 12. Format & Actions
 
 - `<Space>f` - **Format Buffer** - Auto-format current file
 - `<Space>th` - **Toggle Inlay Hints** - Show/hide type hints
 
 ---
 
-## 12. Frequently Asked Questions (FAQ)
+## 13. Frequently Asked Questions (FAQ)
 
 ### What is a buffer?
 

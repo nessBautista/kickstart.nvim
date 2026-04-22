@@ -21,6 +21,13 @@ These keymaps work for **all languages** (Python, Swift, Go, etc.):
 | `<Space>b` | **Breakpoint** | Toggle breakpoint on current line |
 | `<Space>B` | **Conditional Breakpoint** | Set breakpoint with condition |
 
+### Python-specific keymaps
+
+| Keymap | Action | Description |
+|--------|--------|-------------|
+| `<Space>dm` | **Debug test Method** | Debug the pytest/unittest method under the cursor |
+| `<Space>df` | **Debug test class (F)** | Debug the whole test class under the cursor |
+
 ---
 
 ## Prerequisites
@@ -34,11 +41,12 @@ These keymaps work for **all languages** (Python, Swift, Go, etc.):
 
 2. **debugpy will be auto-installed** by Mason when you restart nvim
 
-3. **For virtual environments**, you may need to configure the Python path:
-   ```lua
-   -- Add to your config if needed
-   require('dap-python').setup('~/.virtualenvs/debugpy/bin/python')
+3. **uv / virtualenv auto-detection**: the config prefers `./.venv/bin/python`, then `./venv/bin/python`, and falls back to system `python3`. In a uv project, install debugpy into the project so that interpreter can see it:
+   ```bash
+   uv add --dev debugpy
+   uv sync
    ```
+   See the [Python + uv Workflow](#python--uv-workflow) section for the full loop.
 
 ### Swift Debugging
 
@@ -124,6 +132,75 @@ For more complex setups (e.g., with arguments), you can create a `.vscode/launch
 }
 ```
 
+The config also ships two built-in launch configurations you'll see when you press `<Space>dc` in a Python buffer:
+- **Launch current file** — runs the current buffer under the detected interpreter.
+- **Launch file with args** — same, but prompts for CLI arguments first.
+
+Both set `pythonPath` dynamically, so they follow `.venv/bin/python` on a per-project basis without a reload.
+
+---
+
+## Python + uv Workflow
+
+The debug config is uv-aware. When a session starts it looks for `./.venv/bin/python` (uv's default layout), then `./venv/bin/python`, and only falls back to system `python3` if neither exists. That means you don't have to hard-code interpreter paths per project — just launch nvim from the project root.
+
+### One-time project setup
+
+Add debugpy to the uv project so the project interpreter can import it:
+
+```bash
+uv add --dev debugpy
+uv sync
+```
+
+Mason's debugpy lives in its own environment and is **not** visible to `.venv/bin/python`. Without the step above you'll get `No module named debugpy` on launch.
+
+Optional but useful for the test-debug keymaps:
+
+```bash
+uv add --dev pytest
+```
+
+### Debug the current file
+
+1. `cd` into your uv project (must contain `.venv/`) and open nvim.
+2. `<Space>b` on the line of interest.
+3. `<Space>dc` → pick **Launch current file**.
+
+The debugger launches `.venv/bin/python ${file}` under debugpy. `nvim-dap-virtual-text` annotates variables inline; the dap-ui panels open automatically.
+
+### Debug a single test
+
+With pytest in the venv:
+
+- `<Space>dm` — debug the test **method** under the cursor (e.g. `test_foo` inside a class).
+- `<Space>df` — debug the whole test **class** under the cursor.
+
+Both run via `nvim-dap-python`, which resolves the test selector and hands it to debugpy — you don't need to write a launch config.
+
+### Lightweight escape hatch: `breakpoint()` + `uv run`
+
+For trivial pokes where the full UI is overkill, drop a literal `breakpoint()` in your code and run the script directly:
+
+```bash
+uv run python your_script.py
+```
+
+You get a plain pdb prompt in the terminal, using the same project env. No DAP involved — handy for one-off inspections.
+
+### Troubleshooting the uv path
+
+If a launch uses the wrong interpreter:
+
+```bash
+# From the project root Neovim was launched in:
+ls -la .venv/bin/python
+# Confirm debugpy is importable:
+.venv/bin/python -c "import debugpy; print(debugpy.__version__)"
+```
+
+The resolver uses `vim.fn.getcwd()`, so if you `:cd` away from the project root in nvim, new launches will re-resolve against the new cwd.
+
 ---
 
 ## Swift Debugging Workflow
@@ -199,6 +276,10 @@ When you start debugging or press `<Space>du`, you'll see panels:
 - **Breakpoints** - List of all breakpoints
 - **Console/REPL** - Execute code in debug context
 
+### Inline virtual text
+
+`nvim-dap-virtual-text` is installed, so while a debug session is active you'll see current variable values rendered inline next to the relevant lines in your buffer — no need to switch to the Scopes panel for a quick peek.
+
 ### Navigation in Debug UI
 - `<C-h/j/k/l>` - Move between panels
 - `q` - Close a panel
@@ -244,21 +325,27 @@ When you start debugging or press `<Space>du`, you'll see panels:
 ### Python Issues
 
 **Problem**: "No module named debugpy"
+
+The config launches debugpy with whichever interpreter it detected (`.venv/bin/python` when one exists), so debugpy must be installed in *that* environment — Mason's copy is only visible to Mason's python. Fix:
 ```bash
-# Install manually if needed
-python3 -m pip install debugpy
+# Inside a uv project:
+uv add --dev debugpy
+# Or for a plain venv:
+.venv/bin/python -m pip install debugpy
 ```
 
 **Problem**: Wrong Python interpreter
-```lua
--- In your config, specify the correct Python:
-require('dap-python').setup('/path/to/your/python3')
+
+The resolver picks the first match from: `./.venv/bin/python` → `./venv/bin/python` → `python3`. Check which one is winning:
+```bash
+ls -la .venv/bin/python venv/bin/python 2>/dev/null
 ```
+If none exist in the current working directory, the debugger uses system `python3`. Either `cd` into the project root before launching nvim, or create the venv (`uv sync` for uv projects).
 
 **Problem**: Breakpoints not hitting
 - Ensure file is saved before debugging
 - Check that you're running the correct file
-- Verify debugpy is installed: `:Mason`
+- Verify debugpy is installed in the **project venv**, not just Mason: `.venv/bin/python -c "import debugpy"` should succeed
 
 ### Swift Issues
 

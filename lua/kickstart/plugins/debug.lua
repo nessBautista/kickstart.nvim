@@ -24,6 +24,9 @@ return {
     -- Add your own debuggers here
     'leoluz/nvim-dap-go',
     'mfussenegger/nvim-dap-python',
+
+    -- Inline variable values while debugging
+    'theHamsta/nvim-dap-virtual-text',
   },
   keys = {
     -- Basic debugging keymaps (Magic Keyboard friendly - no F-keys!)
@@ -82,6 +85,20 @@ return {
         require('dapui').toggle()
       end,
       desc = 'Debug: Toggle UI',
+    },
+    {
+      '<leader>dm',
+      function()
+        require('dap-python').test_method()
+      end,
+      desc = 'Debug: Python Test Method',
+    },
+    {
+      '<leader>df',
+      function()
+        require('dap-python').test_class()
+      end,
+      desc = 'Debug: Python Test Class',
     },
   },
   config = function()
@@ -150,6 +167,8 @@ return {
     vim.fn.sign_define('DapStopped', { text = '▶', texthl = 'DapStop', numhl = 'DapStop' })
     vim.fn.sign_define('DapLogPoint', { text = '◆', texthl = 'DapBreak', numhl = 'DapBreak' })
 
+    require('nvim-dap-virtual-text').setup {}
+
     dap.listeners.after.event_initialized['dapui_config'] = dapui.open
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close
@@ -164,7 +183,19 @@ return {
     }
 
     -- Python specific config
-    require('dap-python').setup('python3')
+    -- Prefer a uv/venv-managed interpreter from the current project, falling
+    -- back to system python3 when no venv is detected.
+    local function venv_python()
+      local cwd = vim.fn.getcwd()
+      if vim.fn.executable(cwd .. '/.venv/bin/python') == 1 then
+        return cwd .. '/.venv/bin/python'
+      elseif vim.fn.executable(cwd .. '/venv/bin/python') == 1 then
+        return cwd .. '/venv/bin/python'
+      end
+      return 'python3'
+    end
+
+    require('dap-python').setup(venv_python())
 
     -- Add custom Python configurations for individual scripts
     table.insert(dap.configurations.python, {
@@ -173,6 +204,7 @@ return {
       name = 'Launch current file',
       program = '${file}',
       console = 'integratedTerminal',
+      pythonPath = venv_python,
     })
 
     table.insert(dap.configurations.python, {
@@ -185,6 +217,7 @@ return {
         return vim.split(args_string, " +")
       end,
       console = 'integratedTerminal',
+      pythonPath = venv_python,
     })
 
     -- Swift/LLDB specific config

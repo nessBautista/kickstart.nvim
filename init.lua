@@ -687,6 +687,7 @@ require('lazy').setup({
         -- clangd = {},
         -- gopls = {},
         pyright = {}, -- Python LSP
+        elixirls = {}, -- Elixir LSP (installed via Mason)
         sourcekit = { -- Swift LSP (uses Xcode's sourcekit-lsp, not Mason)
           cmd = { 'sourcekit-lsp' }, -- Uses system PATH (from Xcode)
         },
@@ -756,6 +757,20 @@ require('lazy').setup({
           end,
         },
       }
+
+      -- Manually set up servers that Mason doesn't install. mason-lspconfig's
+      -- handler only fires for servers Mason manages, so non-Mason servers
+      -- like sourcekit-lsp (which ships with Xcode) need an explicit enable.
+      -- Uses the nvim 0.11+ vim.lsp.config API (nvim-lspconfig ships default
+      -- configs under lsp/<name>.lua that we merge our overrides on top of).
+      for _, name in ipairs(mason_exclude) do
+        local server = servers[name]
+        if server then
+          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+          vim.lsp.config(name, server)
+          vim.lsp.enable(name)
+        end
+      end
     end,
   },
 
@@ -791,6 +806,9 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        elixir = { 'mix' },
+        eelixir = { 'mix' },
+        heex = { 'mix' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -963,11 +981,12 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'master',
     build = ':TSUpdate',
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     config = function()
-      require('nvim-treesitter.config').setup {
-        ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'python' },
+      require('nvim-treesitter.configs').setup {
+        ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'python', 'elixir', 'heex', 'eex' },
         -- Autoinstall languages that are not installed
         -- Swift will be auto-installed when you open a .swift file
         auto_install = true,

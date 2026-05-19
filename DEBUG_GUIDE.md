@@ -212,29 +212,41 @@ After restarting nvim, Mason will automatically install:
 
 **Note**: Swift LSP (sourcekit-lsp) will use your system-installed version from Xcode.
 
-### 2. Basic Swift Debugging
+### 2. Loose Swift scripts (no Package.swift)
 
-**Example: Debug a Swift executable**
+Unlike Python, Swift can't be debugged straight from source — LLDB needs a compiled executable with debug symbols. The config automates the compile step for the current buffer:
+
+1. Open a loose `.swift` file:
+   ```vim
+   nvim binary_search.swift
+   ```
+2. Set a breakpoint: `<Space>b`
+3. Start debugging: `<Space>dc` → pick **Launch current Swift file (compile & run, codelldb)**.
+4. Under the hood the config runs:
+   ```bash
+   swiftc -g <current_file>.swift -o <current_file>
+   ```
+   and launches the resulting binary in codelldb. If compilation fails, the error is shown inline and the session aborts.
+
+Use the `lldb` variant instead if you want Apple's `lldb-dap` from Xcode (better Swift stdlib integration in some cases).
+
+### 3. Package-based projects (Package.swift)
+
+When you have a `Package.swift`, build once and point the debugger at the produced binary:
 
 1. **Build your project first**:
    ```bash
    swift build
    ```
 
-2. Open your Swift file:
+2. Open any Swift file in the project:
    ```vim
-   nvim main.swift
+   nvim Sources/MyApp/main.swift
    ```
 
-3. Set breakpoints:
-   ```
-   <Space>b
-   ```
+3. Set breakpoints: `<Space>b`
 
-4. Start debugging:
-   ```
-   <Space>dc
-   ```
+4. Start debugging: `<Space>dc` → pick **Launch Swift (lldb)** or **Launch Swift (codelldb)**.
 
 5. **When prompted, enter the path to your executable**:
    ```
@@ -243,7 +255,7 @@ After restarting nvim, Mason will automatically install:
 
 6. Use debug commands as normal
 
-### 3. Swift Debug Configuration
+### 4. Swift Debug Configuration
 
 For repeated debugging, create `.vscode/launch.json`:
 

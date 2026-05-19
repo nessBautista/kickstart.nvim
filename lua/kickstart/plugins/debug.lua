@@ -237,7 +237,39 @@ return {
       name = 'lldb',
     }
 
+    -- Compile the current .swift buffer with debug symbols and return the
+    -- path to the produced executable. Used by the "current file" debug
+    -- configurations below so loose scripts (no Package.swift) just work.
+    local function compile_current_swift()
+      local src = vim.fn.expand '%:p'
+      if src == '' or not src:match '%.swift$' then
+        error 'Current buffer is not a .swift file'
+      end
+      local out = vim.fn.expand '%:p:r'
+      local result = vim.fn.system { 'swiftc', '-g', src, '-o', out }
+      if vim.v.shell_error ~= 0 then
+        error('swiftc failed:\n' .. result)
+      end
+      return out
+    end
+
     dap.configurations.swift = {
+      {
+        name = 'Launch current Swift file (compile & run, codelldb)',
+        type = 'codelldb',
+        request = 'launch',
+        program = compile_current_swift,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
+      },
+      {
+        name = 'Launch current Swift file (compile & run, lldb)',
+        type = 'lldb',
+        request = 'launch',
+        program = compile_current_swift,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
+      },
       {
         name = 'Launch Swift (lldb)',
         type = 'lldb',
